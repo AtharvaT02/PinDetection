@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Collection</title>
+    <style>
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="number"] {
+            width: 100px;
+        }
+        #output {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Collection</h1>
+    <form id="dataForm">
+        <!-- Accelerometer -->
+        <label for="acceleration_x">Acceleration X:</label>
+        <input type="number" id="acceleration_x" name="acceleration_x" step="0.01">
+        <label for="acceleration_y">Acceleration Y:</label>
+        <input type="number" id="acceleration_y" name="acceleration_y" step="0.01">
+        <label for="acceleration_z">Acceleration Z:</label>
+        <input type="number" id="acceleration_z" name="acceleration_z" step="0.01">
+
+        <!-- Gravity Sensor -->
+        <label for="gravity_x">Gravity X:</label>
+        <input type="number" id="gravity_x" name="gravity_x" step="0.01">
+        <label for="gravity_y">Gravity Y:</label>
+        <input type="number" id="gravity_y" name="gravity_y" step="0.01">
+        <label for="gravity_z">Gravity Z:</label>
+        <input type="number" id="gravity_z" name="gravity_z" step="0.01">
+
+        <!-- Gyroscope -->
+        <label for="gyroscope_x">Gyroscope X:</label>
+        <input type="number" id="gyroscope_x" name="gyroscope_x" step="0.01">
+        <label for="gyroscope_y">Gyroscope Y:</label>
+        <input type="number" id="gyroscope_y" name="gyroscope_y" step="0.01">
+        <label for="gyroscope_z">Gyroscope Z:</label>
+        <input type="number" id="gyroscope_z" name="gyroscope_z" step="0.01">
+
+        <!-- Linear Acceleration -->
+        <label for="linear_acceleration_x">Linear Acceleration X:</label>
+        <input type="number" id="linear_acceleration_x" name="linear_acceleration_x" step="0.01">
+        <label for="linear_acceleration_y">Linear Acceleration Y:</label>
+        <input type="number" id="linear_acceleration_y" name="linear_acceleration_y" step="0.01">
+        <label for="linear_acceleration_z">Linear Acceleration Z:</label>
+        <input type="number" id="linear_acceleration_z" name="linear_acceleration_z" step="0.01">
+
+        <!-- Rotation Vector -->
+        <label for="rotation_vector_x">Rotation Vector X:</label>
+        <input type="number" id="rotation_vector_x" name="rotation_vector_x" step="0.01">
+        <label for="rotation_vector_y">Rotation Vector Y:</label>
+        <input type="number" id="rotation_vector_y" name="rotation_vector_y" step="0.01">
+        <label for="rotation_vector_z">Rotation Vector Z:</label>
+        <input type="number" id="rotation_vector_z" name="rotation_vector_z" step="0.01">
+
+        <!-- Orientation Sensor -->
+        <label for="pitch">Pitch:</label>
+        <input type="number" id="pitch" name="pitch" step="0.01">
+        <label for="roll">Roll:</label>
+        <input type="number" id="roll" name="roll" step="0.01">
+        <label for="yaw">Yaw:</label>
+        <input type="number" id="yaw" name="yaw" step="0.01">
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="output">
+        <h2>Collected Data</h2>
+        <ul id="dataList"></ul>
+    </div>
+
+    <script>
+        document.getElementById("dataForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const acceleration_x = parseFloat(document.getElementById("acceleration_x").value);
+            const acceleration_y = parseFloat(document.getElementById("acceleration_y").value);
+            const acceleration_z = parseFloat(document.getElementById("acceleration_z").value);
+
+            const gravity_x = parseFloat(document.getElementById("gravity_x").value);
+            const gravity_y = parseFloat(document.getElementById("gravity_y").value);
+            const gravity_z = parseFloat(document.getElementById("gravity_z").value);
+
+            const gyroscope_x = parseFloat(document.getElementById("gyroscope_x").value);
+            const gyroscope_y = parseFloat(document.getElementById("gyroscope_y").value);
+            const gyroscope_z = parseFloat(document.getElementById("gyroscope_z").value);
+
+            const linear_acceleration_x = parseFloat(document.getElementById("linear_acceleration_x").value);
+            const linear_acceleration_y = parseFloat(document.getElementById("linear_acceleration_y").value);
+            const linear_acceleration_z = parseFloat(document.getElementById("linear_acceleration_z").value);
+
+            const rotation_vector_x = parseFloat(document.getElementById("rotation_vector_x").value);
+            const rotation_vector_y = parseFloat(document.getElementById("rotation_vector_y").value);
+            const rotation_vector_z = parseFloat(document.getElementById("rotation_vector_z").value);
+
+            const pitch = parseFloat(document.getElementById("pitch").value);
+            const roll = parseFloat(document.getElementById("roll").value);
+            const yaw = parseFloat(document.getElementById("yaw").value);
+
+            // Calculate additional variable M
+            const M = Math.sqrt(pitch**2 + roll**2);
+
+            // Display collected data
+            const dataList = document.getElementById("dataList");
+            dataList.innerHTML = `
+                <li>Acceleration X: ${acceleration_x}</li>
+                <li>Acceleration Y: ${acceleration_y}</li>
+                <li>Acceleration Z: ${acceleration_z}</li>
+                <li>Gravity X: ${gravity_x}</li>
+                <li>Gravity Y: ${gravity_y}</li>
+                <li>Gravity Z: ${gravity_z}</li>
+                <li>Gyroscope X: ${gyroscope_x}</li>
+                <li>Gyroscope Y: ${gyroscope_y}</li>
+                <li>Gyroscope Z: ${gyroscope_z}</li>
+                <li>Linear Acceleration X: ${linear_acceleration_x}</li>
+                <li>Linear Acceleration Y: ${linear_acceleration_y}</li>
+                <li>Linear Acceleration Z: ${linear_acceleration_z}</li>
+                <li>Rotation Vector X: ${rotation_vector_x}</li>
+                <li>Rotation Vector Y: ${rotation_vector_y}</li>
+                <li>Rotation Vector Z: ${rotation_vector_z}</li>
+                <li>Pitch: ${pitch}</li>
+                <li>Roll: ${roll}</li>
+                <li>Yaw: ${yaw}</li>
+                <li>M: ${M}</li>
+            `;
+        });
+    </script>
+</body>
+</html>
