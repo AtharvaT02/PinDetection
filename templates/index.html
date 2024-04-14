@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keypad</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .keypad-container {
+            position: relative;
+            margin-top: auto; /* Pushes keypad to the bottom */
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 5px;
+            max-width: 300px;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .key {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            background-color: #ffffff;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #inputField {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }   
+
+        .reset-button {
+            margin: 0 5px 5px 5px;
+        }
+
+        .send-button {
+            grid-column: span 2; /* span two columns */
+        }
+
+        table {
+            margin-bottom: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+        .popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+    }
+
+    .popup button {
+        margin-top: 10px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+    .popup button:hover {
+        background-color: #0056b3;
+    }
+    </style>
+</head>
+<body>
+    <div>Some Sensor Data</div>
+    <table id="sensorTable">
+        <tr>
+            <th>Sensor</th>
+            <th>Data</th>
+        </tr>
+        <tr>
+            <td>acceleration_x</td>
+            <td id="acceleration_x_data"></td>
+        </tr>
+        <tr>
+            <td>acceleration_y</td>
+            <td id="acceleration_y_data"></td>
+        </tr>
+        <tr>
+            <td>acceleration_z</td>
+            <td id="acceleration_z_data"></td>
+        </tr>
+        <tr>
+            <td>gyroscope_x</td>
+            <td id="gyroscope_x_data"></td>
+        </tr>
+        <tr>
+            <td>gyroscope_y</td>
+            <td id="gyroscope_y_data"></td>
+        </tr>
+        <tr>
+            <td>gyroscope_z</td>
+            <td id="gyroscope_z_data"></td>
+        </tr>
+        <tr>
+            <td>M</td>
+            <td id="M_data"></td>
+        </tr>
+    </table>
+    
+
+    <div class="keypad-container">
+        <input type="text" id="inputField" maxlength="1" readonly>
+        <div class="key reset-button" onclick="resetPage()">Reset</div>
+        <div class="keypad">
+            <div class="key" onclick="addToInput(1)">1</div>
+            <div class="key" onclick="addToInput(2)">2</div>
+            <div class="key" onclick="addToInput(3)">3</div>
+            <div class="key" onclick="addToInput(4)">4</div>
+            <div class="key" onclick="addToInput(5)">5</div>
+            <div class="key" onclick="addToInput(6)">6</div>
+            <div class="key" onclick="addToInput(7)">7</div>
+            <div class="key" onclick="addToInput(8)">8</div>
+            <div class="key" onclick="addToInput(9)">9</div>
+            <div class="key" onclick="addToInput(0)">0</div>
+            <div class="key send-button" onclick="sendData()">Send Data</div>
+        </div>
+    </div>
+    <script>
+        // Define global variables to store the dataset and the latest selected row
+        let dataset = [];
+        let latestSelectedRow = null; // Store the latest selected row
+        let allowSensorUpdates = true; // Flag to control sensor updates
+    
+        // Load dataset from text file
+        fetch("/static/data.txt")
+            .then(response => response.text())
+            .then(data => {
+                // Split the text file into lines
+                const lines = data.trim().split('\n');
+                
+                // Parse each line and store in dataset array
+                dataset = lines.map(line => line.trim().split(',').map(item => parseFloat(item)));
+            })
+            .catch(error => console.error('Error loading dataset:', error));
+    
+        // Function to filter dataset and select random row
+        function selectRandomRow(digit) {
+            // Filter dataset to find rows with matching first digit
+            const filteredRows = dataset.filter(row => Math.floor(row[0]) === digit);
+    
+            // Select a random row from filtered dataset
+            const randomIndex = Math.floor(Math.random() * filteredRows.length);
+            const selectedRow = filteredRows[randomIndex].slice(1); // Exclude element at index 0
+            latestSelectedRow = selectedRow; // Store the latest selected row
+            updateTable(selectedRow);
+        }
+    
+        // Function to handle digit button clicks
+        function handleDigitClick(digit) {
+            // Call selectRandomRow function with clicked digit
+            selectRandomRow(digit);
+        }
+    
+        // Function to update table with selected row
+        function updateTable(selectedRow) {
+            // Select table rows for sensor data
+            const sensorRows = document.querySelectorAll('#sensorTable tr');
+    
+            // Update sensor data rows with values from selected row
+            for (let i = 0; i < 6; i++) {
+                sensorRows[i+1].cells[1].textContent = selectedRow[i]; // Update data column
+            }
+    
+            // Update last row with value from last index of selected row
+            sensorRows[7].cells[1].textContent = selectedRow[selectedRow.length - 1];
+    
+            // Disable sensor updates after setting values from the selected row
+            allowSensorUpdates = false;
+        }
+    
+        // Function to display prediction popup
+        function showPredictionPopup(prediction) {
+        // Extract the predicted digit from the prediction object
+        var predictedDigit = prediction.prediction;
+
+        if (predictedDigit == 10) {
+            predictedDigit = 0;
+        }
+        // Create a popup element
+        const popup = document.createElement('div');
+        popup.className = 'popup';
+
+        // Create content for the popup
+        const content = document.createElement('div');
+        content.innerHTML = `Predicted Digit using Sensor Data: ${predictedDigit}`;
+        popup.appendChild(content);
+
+        // Create a reload button
+        const reloadButton = document.createElement('button');
+        reloadButton.textContent = 'Reload';
+        reloadButton.onclick = function() {
+            location.reload();
+        };
+        popup.appendChild(reloadButton);
+
+        // Append the popup to the body
+        document.body.appendChild(popup);
+    }
+    
+        // Function to send data for prediction to Flask backend
+        function sendPredictionRequest(data) {
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ input_data: data })
+            })
+            .then(response => response.json())
+            .then(prediction => {
+                console.log('Prediction received:', prediction);
+                // Show prediction popup
+                showPredictionPopup(prediction);
+            })
+            .catch(error => console.error('Error predicting:', error));
+        }
+    
+        function addToInput(value) {
+            handleDigitClick(value);
+            var inputField = document.getElementById('inputField');
+            inputField.value = value;
+        }
+    
+        function sendData() {
+            // Check if latestSelectedRow is not null
+            if (latestSelectedRow !== null) {
+                // Send data for prediction
+                sendPredictionRequest(latestSelectedRow);
+                // Clear the latestSelectedRow after sending data
+                latestSelectedRow = null;
+            } else {
+                console.log('No data selected for prediction.');
+            }
+        }
+    
+        function resetPage() {
+            location.reload(); // Reload the page
+        }
+    
+        // Update sensor data
+        window.addEventListener('devicemotion', function(event) {
+            if (allowSensorUpdates) {
+                document.getElementById('acceleration_x_data').textContent = event.accelerationIncludingGravity.x.toFixed(2);
+                document.getElementById('acceleration_y_data').textContent = event.accelerationIncludingGravity.y.toFixed(2);
+                document.getElementById('acceleration_z_data').textContent = event.accelerationIncludingGravity.z.toFixed(2);
+                document.getElementById('gyroscope_x_data').textContent = event.rotationRate.alpha.toFixed(2);
+                document.getElementById('gyroscope_y_data').textContent = event.rotationRate.beta.toFixed(2);
+                document.getElementById('gyroscope_z_data').textContent = event.rotationRate.gamma.toFixed(2);
+    
+                // Calculate M
+                var acceleration_x = event.accelerationIncludingGravity.x;
+                var acceleration_y = event.accelerationIncludingGravity.y;
+                var acceleration_z = event.accelerationIncludingGravity.z;
+                var gyroscope_x = event.rotationRate.alpha;
+                var gyroscope_y = event.rotationRate.beta;
+                var gyroscope_z = event.rotationRate.gamma;
+    
+                var M = (acceleration_x + acceleration_y + acceleration_z) / (gyroscope_x + gyroscope_y + gyroscope_z);
+                document.getElementById('M_data').textContent = M.toFixed(2);
+            }
+        });
+    </script>
+    
+</body>
+</html>
