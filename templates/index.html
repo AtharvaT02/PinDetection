@@ -300,6 +300,17 @@
                 document.getElementById('M_data').textContent = M.toFixed(2);
             }
         });
+        function isMobileDevice() {
+            return /Mobi/i.test(navigator.userAgent);
+        }
+
+        // Check if the device is a mobile phone
+        // if (!isMobileDevice()) {
+        //     // Display error message
+        //     document.body.innerHTML = "<h1>Your device does not have any sensors.</h1>";
+        //     // Optionally, you can redirect to an error page
+        //     // window.location.href = "error.html";
+        // }
     </script>
     
 </body>
