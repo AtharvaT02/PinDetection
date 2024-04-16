@@ -16,7 +16,7 @@ def index():
 def predict():
     # Get data from the request sent by index.html
     data = request.json
-    print(sensor_data)
+    print(data)
     # Convert data to numpy array for prediction
     input_data = np.array(data['input_data']).reshape(1, -1)
     
